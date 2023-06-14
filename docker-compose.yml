@@ -7,8 +7,8 @@ services:
     volumes:
       - ./bind/data:/data
       #- ./bind/etc:/etc/bind
-      - ./bind/named.conf.local:/etc/bind/named.conf.local
-      - ./bind/named.conf.options:/etc/bind/named.conf.options
+      #- ./bind/named.conf.local:/etc/bind/named.conf.local
+      #- ./bind/named.conf.options:/etc/bind/named.conf.options
     ports:
       - 5353:53/udp
       #- 10000:10000/tcp
