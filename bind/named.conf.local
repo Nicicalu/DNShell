@@ -1,0 +1,4 @@
+zone "dnshell.programm.zip" {
+    type master;
+    file "/data/dnshell.programm.zip.zone";
+};

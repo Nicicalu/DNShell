@@ -1,0 +1,12 @@
+$TTL 1h
+@       IN SOA  ns.programm.zip. hostmaster.nicolas-caluori.ch. (
+                   2023061401     ; Serial
+                   1h             ; Refresh
+                   15m            ; Retry
+                   1w             ; Expire
+                   1h             ; Minimum TTL
+                   )
+        IN NS   ns.programm.zip.
+
+dnshell.programm.zip.   IN A    1.2.3.4
+test.dnshell.programm.zip.   IN A    4.3.2.1
