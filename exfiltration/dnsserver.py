@@ -6,6 +6,7 @@ import socketserver
 
 class DNSServer(socketserver.BaseRequestHandler):
     def handle(self):
+        print("Handle")
         data = self.request[0]
         socket = self.request[1]
 
@@ -38,12 +39,12 @@ class DNSServer(socketserver.BaseRequestHandler):
 
         response = dns.message.make_response(query)
         response.set_rcode(dns.rcode.NOERROR)
-        response.answer.append(dns.rrset.from_text('example.com. 300 IN A 192.0.2.1'))
+        response.answer.append(dns.rrset.from_text('programm.zip. 300 IN A 9.8.7.6'))
 
         return response
 
 # Create a UDP server and bind it to a specific IP address and port
-server = socketserver.UDPServer(('0.0.0.0', 53), DNSServer)
+server = socketserver.UDPServer(('0.0.0.0', 5353), DNSServer)
 
 # Start the DNS server
 server.serve_forever()
