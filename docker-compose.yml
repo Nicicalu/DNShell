@@ -1,6 +1,16 @@
+version: '3'
 services:
-  exfiltration:
-    build: ./exfiltration
+  bind9:
+    image: sameersbn/bind:latest
+    container_name: dnsserver
+    restart: always
+    volumes:
+      - ./bind/data:/data
+      - ./bind/named.conf.local:/etc/bind/named.conf.local
+      - ./bind/named.conf.options:/etc/bind/named.conf.options
     ports:
-      - "5353:5353/udp"
-      - "5353:5353/tcp"
+      - 5353:53/udp
+      #- 10000:10000/tcp
+    environment:
+      - WEBMIN_ENABLED=true
+      - WEBMIN_PORT=10000

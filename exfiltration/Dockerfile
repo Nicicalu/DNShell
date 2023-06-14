@@ -3,4 +3,4 @@ WORKDIR /code
 COPY . .
 RUN pip install -r requirements.txt
 EXPOSE 5353
-CMD ["python3", "dnsserver.py"]
+CMD ["python3", "control.py"]
