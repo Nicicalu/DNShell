@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     servers = [
         socketserver.ThreadingUDPServer(('', PORT), UDPRequestHandler),
-        #socketserver.ThreadingTCPServer(('', PORT), TCPRequestHandler),
+        socketserver.ThreadingTCPServer(('', PORT), TCPRequestHandler),
     ]
     for s in servers:
         thread = threading.Thread(target=s.serve_forever)  # that thread will start one more thread for each request
