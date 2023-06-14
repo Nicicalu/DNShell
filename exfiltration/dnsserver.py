@@ -43,7 +43,7 @@ class DNSServer(socketserver.BaseRequestHandler):
         return response
 
 # Create a UDP server and bind it to a specific IP address and port
-server = socketserver.UDPServer(('localhost', 53), DNSServer)
+server = socketserver.UDPServer(('0.0.0.0', 53), DNSServer)
 
 # Start the DNS server
 server.serve_forever()
