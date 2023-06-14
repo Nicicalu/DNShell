@@ -111,9 +111,11 @@ class TCPRequestHandler(BaseRequestHandler):
 class UDPRequestHandler(BaseRequestHandler):
 
     def get_data(self):
+        print("UDP Get data")
         return self.request[0].strip()
 
     def send_data(self, data):
+        print("UDP send data")
         return self.request[1].sendto(data, self.client_address)
 
 
