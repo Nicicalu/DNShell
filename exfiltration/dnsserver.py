@@ -19,7 +19,7 @@ class DomainName(str):
 D = DomainName('dnshell.programm.zip')
 IP = '0.0.0.0'
 TTL = 60 * 5
-PORT = 5353
+PORT = 5053
 
 soa_record = SOA(
     mname=D.ns1,  # primary name server
