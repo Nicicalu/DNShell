@@ -1,20 +1,11 @@
 version: '3'
 services:
   bind9:
-    image: sameersbn/bind:latest
-    container_name: dnsserver
-    restart: always
-    volumes:
-      - ./bind/data:/data
-      #- ./bind/etc:/etc/bind
-      #- ./bind/named.conf.local:/etc/bind/named.conf.local
-      #- ./bind/named.conf.options:/etc/bind/named.conf.options
+    image: ubuntu/bind9
     ports:
-      - 173.212.225.214:54:53/udp
-      #- 10000:10000/tcp
-    environment:
-      - WEBMIN_ENABLED=true
-      - WEBMIN_PORT=10000
-      - VIRTUAL_HOST=webmin.k26.ch
-      - LETSENCRYPT_HOST=webmin.k26.ch
-      - VIRTUAL_PORT=10000
+      - "53:53"
+      - "53:53/udp"
+    volumes:
+      - ./bind/data/named.conf.local:/etc/bind/named.conf.local
+      - ./bind/zones:/etc/bind/zones
+    restart: always
