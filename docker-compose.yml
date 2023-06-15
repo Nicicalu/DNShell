@@ -2,6 +2,7 @@ version: '3'
 services:
   bind9:
     image: ubuntu/bind9
+    hostname: bind9
     ports:
       - "53:53"
       - "53:53/udp"
