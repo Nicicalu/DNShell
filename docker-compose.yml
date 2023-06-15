@@ -5,6 +5,7 @@ services:
     hostname: bind9
     ports:
       - "173.212.225.214:53:53"
+      - "173.212.225.214:53:53/udp"
     volumes:
       - ./bind/data:/etc/bind
       - ./bind/cache:/var/cache/bind
