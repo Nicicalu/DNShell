@@ -6,7 +6,7 @@ services:
     ports:
       - "173.212.225.214:53:53"
     volumes:
-      - ./bind/data/named.conf:/etc/bind/named.conf
+      - ./bind/data:/etc/bind/
       - ./bind/zones:/etc/bind/zones
       - ./bind/cache:/var/cache/bind
       - ./bind/records:/var/lib/bind
