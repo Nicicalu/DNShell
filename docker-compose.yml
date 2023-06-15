@@ -4,7 +4,7 @@ services:
     image: ubuntu/bind9
     hostname: bind9
     ports:
-      - "53:53"
+      - "54:53"
     volumes:
       - ./bind/data/named.conf:/etc/bind/named.conf
       - ./bind/zones:/etc/bind/zones
