@@ -11,7 +11,10 @@ services:
       #- ./bind/named.conf.options:/etc/bind/named.conf.options
     ports:
       - 173.212.225.214:54:53/udp
-      - 10000:10000/tcp
+      #- 10000:10000/tcp
     environment:
       - WEBMIN_ENABLED=true
       - WEBMIN_PORT=10000
+      - VIRTUAL_HOST=webmin.k26.ch
+      - LETSENCRYPT_HOST=webmin.k26.ch
+      - VIRTUAL_PORT=10000
