@@ -7,6 +7,8 @@ services:
       - "53:53"
       - "53:53/udp"
     volumes:
-      - ./bind/data/named.conf.local:/etc/bind/named.conf.local
+      - ./bind/data/named.conf.local:/etc/bind/named.conf
       - ./bind/zones:/etc/bind/zones
+      - ./bind/cache:/var/cache/bind
+      - ./bind/records:/var/lib/bind
     restart: always
