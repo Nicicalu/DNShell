@@ -6,10 +6,9 @@ services:
     ports:
       - "173.212.225.214:53:53"
     volumes:
-      - ./bind/data:/etc/bind/
-      - ./bind/zones:/etc/bind/zones
+      - ./bind/data:/etc/bind
       - ./bind/cache:/var/cache/bind
       - ./bind/records:/var/lib/bind
-    #environment:
-      #- BIND9_USER=bind
+    environment:
+      - BIND9_USER=root
     restart: always
