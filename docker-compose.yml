@@ -11,4 +11,6 @@ services:
       - ./bind/zones:/etc/bind/zones
       - ./bind/cache:/var/cache/bind
       - ./bind/records:/var/lib/bind
+    #environment:
+      #- BIND9_USER=bind
     restart: always
