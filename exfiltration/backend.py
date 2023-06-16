@@ -26,7 +26,7 @@ while True:
         match = re.findall(pattern, line_str)
         if match:
             # Extract the information from the match
-            ip_address, domain_name, query_type, query_class, _, _ = match[0]
+            matches = match[0]
 
             # Do something with the extracted information
             print(f"New query arrived from {ip_address} for {domain_name} ({query_type}/{query_class})")
