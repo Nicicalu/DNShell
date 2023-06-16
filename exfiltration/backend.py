@@ -1,23 +1,25 @@
-import pyinotify
+import subprocess
+import re
 
-# Define the path to the BIND log file
-BIND_LOG_FILE = "/var/log/named/query.log"
+logfile = "../bind/log/query.log"
 
-# Create a class that handles the events triggered by pyinotify
-class QueryEventHandler(pyinotify.ProcessEvent):
-    def process_IN_MODIFY(self, event):
-        # Perform your desired action here
-        print("New query arrived!")
+# Define a regular expression pattern to match the log line
+pattern = r"queries: client @\S+ (\d+\.\d+\.\d+\.\d+)#\d+ \((\S+)\): query: (\S+) (\S+) (\S+)"
 
-# Create an instance of the QueryEventHandler
-handler = QueryEventHandler()
+# Start tailing the log file
+p = subprocess.Popen(['tail', '-F', logfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-# Create a WatchManager object and initialize a notifier
-wm = pyinotify.WatchManager()
-notifier = pyinotify.Notifier(wm, handler)
+# Loop through the output of tail
+while True:
+    line = p.stdout.readline()
+    if line:
+        # Use the regular expression pattern to extract the relevant information from the log line
+        match = re.match(pattern, line)
+        if match:
+            ip_address = match.group(1)
+            domain_name = match.group(2)
+            query_type = match.group(3)
+            query_class = match.group(4)
 
-# Add a watch for modifications on the BIND log file
-wm.add_watch(BIND_LOG_FILE, pyinotify.IN_MODIFY)
-
-# Start the notifier loop
-notifier.loop()
+            # Do something with the extracted information
+            print(f"New query arrived from {ip_address} for {domain_name} ({query_type}/{query_class})")
