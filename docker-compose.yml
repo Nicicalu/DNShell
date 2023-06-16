@@ -14,4 +14,4 @@ services:
     environment:
       - BIND9_USER=root
     restart: always
-    command: named -g -q -u bind -f -L /var/log/bind/query.log
+    command: named -g -u bind -f -L /var/log/bind/query.log
