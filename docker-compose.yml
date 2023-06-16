@@ -10,6 +10,7 @@ services:
       - ./bind/data:/etc/bind
       - ./bind/cache:/var/cache/bind
       - ./bind/records:/var/lib/bind
+      - ./bind/log:/var/log/bind
     environment:
       - BIND9_USER=root
     restart: always
