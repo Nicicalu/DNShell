@@ -23,8 +23,7 @@ while True:
         line_str = line.decode()
 
         # Use the regular expression pattern to extract the relevant information from the log line
-        match = re.match(pattern, line_str)
-        pprint(re.findall(pattern, line_str))
+        match = re.findall(pattern, line_str)
         if match:
             ip_address = match.group(1)
             domain_name = match.group(2)
