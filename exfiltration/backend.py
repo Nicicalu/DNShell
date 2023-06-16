@@ -14,7 +14,7 @@ while True:
     line = p.stdout.readline()
     if line:
         # Use the regular expression pattern to extract the relevant information from the log line
-        match = re.match(pattern, line.decode())
+        match = re.match(pattern, "16-Jun-2023 15:28:08.026 queries: client @0x7f3d18004548 193.135.143.35#56620 (test46.dnshell.programm.zip): query: test46.dnshell.programm.zip IN AAAA -E(0)D (192.168.64.2)")
         if match:
             ip_address = match.group(1)
             domain_name = match.group(2)
