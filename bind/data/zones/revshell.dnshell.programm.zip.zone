@@ -1,0 +1,12 @@
+$TTL 2d
+
+$ORIGIN revshell.dnshell.programm.zip.
+
+@			IN	SOA	ns.programm.zip. info.nicolas-caluori.ch. (
+					0000000001	; serial
+					12h		; refresh
+					15m		; retry
+					3w		; expiry
+					1h		; minimum ttl
+					)
+			IN	NS	ns.programm.zip.

