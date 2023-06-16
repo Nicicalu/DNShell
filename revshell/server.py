@@ -94,7 +94,7 @@ def getData(code, counter, returndata=False, returnDataAndIp=False):
 print("Waiting for client to connect... and identify itself")
 code, current_ip = getData(0, 0, True, True)
 print(f"ID for this Reverse Shell: {code}")
-print(f"IP of the Victim: {current_ip}")
+print(f"IP of the nearest DNS: {current_ip}")
 
 filename = f"../bind/data/zones/revshell.{domain}.zone"
 preset = f"../bind/data/zones/revshell.{domain}.preset"
