@@ -25,10 +25,8 @@ while True:
         # Use the regular expression pattern to extract the relevant information from the log line
         match = re.findall(pattern, line_str)
         if match:
-            ip_address = match.group(1)
-            domain_name = match.group(2)
-            query_type = match.group(3)
-            query_class = match.group(4)
+            # Extract the information from the match
+            ip_address, domain_name, query_type, query_class, _, _ = match[0]
 
             # Do something with the extracted information
             print(f"New query arrived from {ip_address} for {domain_name} ({query_type}/{query_class})")
