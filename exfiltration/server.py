@@ -61,14 +61,6 @@ while True:
                     print(f"Decoded: {decoded}")
                 else:
                     print(f"--- Still missing {int(thisdata[2]) - len(data[thisdata[3]])} packets")
-                    # Put the data together in one variable
-                    datastring = ""
-                    for i in range(0, int(thisdata[2])):
-                        datastring += data[thisdata[3]][i]
-                    print(f"Base64: {datastring}")
-                    # decode base64
-                    decoded = base64_decode_string(datastring)
-                    print(f"Decoded: {decoded}")
                     
         else:
             print(f"No match {line_str}")

