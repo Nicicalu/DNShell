@@ -14,4 +14,4 @@ services:
     environment:
       - BIND9_USER=root
     restart: always
-    command: /usr/sbin/named -u "root" -f
+    entrypoint: ["/usr/sbin/named", "-g", "-q", "-u", "root", "-f", "-L", "/var/log/bind/query.log"]
