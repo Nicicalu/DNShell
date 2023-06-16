@@ -73,11 +73,11 @@ def getData():
 print("Enter code:")
 code = input()
 
-filename = f"../bind/zones/revshell.{domain}.zone"
+filename = f"../bind/data/zones/revshell.{domain}.zone"
 
 command = ""
+counter = 0
 while(command != "exit"):
-    counter = 0
     print("Enter command:")
     command = input()
     
