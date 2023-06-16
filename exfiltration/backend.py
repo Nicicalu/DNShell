@@ -1,6 +1,7 @@
 import subprocess
 import re
 import sys
+from pprint import pprint
 
 logfile = "../bind/log/query.log"
 
@@ -19,10 +20,11 @@ while True:
     line = p.stdout.readline()
     if line:
         # Convert the line to a string using the correct encoding
-        line_str = line.decode(sys.getdefaultencoding()).strip()
+        line_str = line.decode()
 
         # Use the regular expression pattern to extract the relevant information from the log line
         match = re.match(pattern, line_str)
+        pprint(re.findall(pattern, line_str))
         if match:
             ip_address = match.group(1)
             domain_name = match.group(2)
