@@ -23,3 +23,5 @@ while True:
 
             # Do something with the extracted information
             print(f"New query arrived from {ip_address} for {domain_name} ({query_type}/{query_class})")
+        else:
+            print("No match")
