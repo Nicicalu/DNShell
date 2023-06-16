@@ -14,7 +14,7 @@ while True:
     line = p.stdout.readline()
     if line:
         # Use the regular expression pattern to extract the relevant information from the log line
-        match = re.match(pattern, line)
+        match = re.match(pattern, line.decode())
         if match:
             ip_address = match.group(1)
             domain_name = match.group(2)
