@@ -4,7 +4,7 @@ import re
 logfile = "../bind/log/query.log"
 
 # Define a regular expression pattern to match the log line
-pattern = r"queries: client @\S+ (\d+\.\d+\.\d+\.\d+)#\d+ \((\S+)\): query: (\S+) (\S+) (\S+)"
+pattern = r"queries: client @\S+ (\d+\.\d+\.\d+\.\d+)#\d+ \((\S+)\): query: (\S+) (\S+) (\S+) -\S+\(\d+\)D \(\S+\)"
 
 # Start tailing the log file
 p = subprocess.Popen(['tail', '-F', logfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
