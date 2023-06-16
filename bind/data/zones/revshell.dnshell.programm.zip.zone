@@ -10,4 +10,3 @@ $ORIGIN revshell.dnshell.programm.zip.
 					1h		; minimum ttl
 					)
 			IN	NS	ns.programm.zip.
-test2			IN	A	14.15.17.18
