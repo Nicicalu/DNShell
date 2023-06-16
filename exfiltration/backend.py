@@ -25,3 +25,4 @@ while True:
             print(f"New query arrived from {ip_address} for {domain_name} ({query_type}/{query_class})")
         else:
             print(f"No match {line.decode()}")
+            print(f"Pattern {pattern}")
