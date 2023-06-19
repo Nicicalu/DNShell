@@ -144,11 +144,11 @@ while(command != "exit"):
     if(command != "exit"):
         # Get response from client
         response = getData(code, counter)
-        pprint(response)
         pwd = response["pwd"]
         user = response["user"]
         hostname = response["hostname"]
         output = response["output"]
+        
         print(output)
 
     counter += 1
