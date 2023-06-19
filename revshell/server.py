@@ -3,6 +3,15 @@ import re
 import sys
 import base64
 
+print("""
+     ______ _   _  _____ _          _ _ 
+    |  _  \ \ | |/  ___| |        | | |
+    | | | |  \| |\ `--.| |__   ___| | |
+    | | | | . ` | `--. \ '_ \ / _ \ | |
+    | |/ /| |\  |/\__/ / | | |  __/ | |
+    |___/ \_| \_/\____/|_| |_|\___|_|_|
+      """)
+
 
 def base64_decode_string(encoded_string):
     decoded_bytes = base64.b64decode(encoded_string)
@@ -81,7 +90,7 @@ def getData(code, counter, returndata=False, returnDataAndIp=False):
                         print(decoded)
                         waitingfordata = False
 
-                    #else:
+                    # else:
                         #print(f"--- Still missing {int(thisdata[2]) - len(data[thisdata[3]])} packets")
 
                 # else:
