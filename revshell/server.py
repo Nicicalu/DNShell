@@ -16,6 +16,16 @@ print("""
     |___/ \_| \_/\____/|_| |_|\___|_|_|
       """)
 
+print("""
+| ------------------------------------------------------------------------------------------------------|
+| When you start DNShell without parameters it starts the server and waits for incoming connections.    |
+| If you need the .ps1 file for the vitcim. Use the "--generate-client" argument                        |
+|                                                                                                       |
+| Author: Nicolas Caluori                                                                               |
+| Github: https://github.com/Nicicalu/dnshell                                                           |
+|-------------------------------------------------------------------------------------------------------|
+    """)
+
 
 def base64_decode_string(encoded_string):
     decoded_bytes = base64.b64decode(encoded_string)
@@ -105,6 +115,15 @@ def getData(code, counter):
 def generateClient():
     # Function to generate client
     print("Generating client... for domain {domain}")
+    # Read client-preset.ps1
+
+    # Replace {domain} with the variable domain in the file
+
+    # prompt the user for the path, defaults to to "./client.ps1"
+
+    # export the file
+
+    # ask the user if he wants to start the server
 
 def main():
     parser = argparse.ArgumentParser()
