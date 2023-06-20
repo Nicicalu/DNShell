@@ -24,7 +24,7 @@ print("""
 | Author: Nicolas Caluori                                                                               |
 | Github: https://github.com/Nicicalu/dnshell                                                           |
 |-------------------------------------------------------------------------------------------------------|
-    """)
+""")
 
 
 def base64_decode_string(encoded_string):
