@@ -115,16 +115,28 @@ def getData(code, counter):
 def generateClient():
     # Function to generate client
     print("Generating client... for domain {domain}")
-    # Read client-preset.ps1
+        # Read client-preset.ps1
+    with open('client-preset.ps1', 'r') as f:
+        content = f.read()
 
     # Replace {domain} with the variable domain in the file
+    content = content.replace('{domain}', domain)
 
     # prompt the user for the path, defaults to to "./client.ps1"
+    path = input('Enter the path to export the file (default: ./client.ps1): ') or './client.ps1'
 
-    # export the file
+    # export the file to the path specified
+    with open(path, 'w') as f:
+        f.write(content)
 
     # ask the user if he wants to start the server
-
+    start_server = input('Do you want to start the server? (y/n): ')
+    if start_server.lower() == 'y':
+        # start the server
+        # ...
+        pass
+    else:
+        main()
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--generate-client", action="store_true", help="Generates the .ps1 client file")
