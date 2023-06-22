@@ -77,7 +77,7 @@ def getData(code, counter):
                     "query_type": matches[4],
                     "domain_parts": matches[1].replace(f".{domain}", "").split(".")
                 }
-                if query["query_type"] == "A" and query["domain_name"].endswith(f"{code}-{counter}.{domain}"):
+                if query["query_type"] == "A" and lower(query["domain_name"]).endswith(f"{code}-{counter}.{domain}"):
                     thisdata = query["domain_parts"]
 
                     #print(f"New query arrived from {query['ip_address']} for {query['domain_name']}, type: {query['query_type']}, class: {query['query_class']}")
