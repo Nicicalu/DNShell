@@ -111,9 +111,12 @@ def getData(code, counter):
                         for i in range(0, int(thisdata[2])):
                             datastring += data[thisdata[3]][i]
 
+                        # Lower because anti dns caching messed up the cases
+                        datastring = datastring.lower()
+
                         print(f"Base64 with hyphens: {datastring}")
                         # For every letter in the string, if there is a hyphen in front of it, change it to upper case
-                        restore_case_by_hyphen(datastring)
+                        datastring = restore_case_by_hyphen(datastring)
 
                         print(f"Base64: {datastring}")
 
