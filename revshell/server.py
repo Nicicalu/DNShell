@@ -89,10 +89,7 @@ def getData(code, counter):
                                       ] = thisdata[0].replace("_", "=")
 
                     print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
-                    if len(data[thisdata[3]]) == int(thisdata[2]):
-                        # Clear progress_bar (remove last line in terminal)
-                        
-                        
+                    if len(data[thisdata[3]]) == int(thisdata[2]):                       
                         #print("--------------------- Data recieved ---------------------")
                         # Put the data together in one variable
                         datastring = ""
