@@ -48,7 +48,7 @@ with open(logfile, "w") as file:
 pattern = r"queries: client @\S+ (\d+\.\d+\.\d+\.\d+)#\d+ \((\S+)\): query: (\S+) (\S+) (\S+) \S+\ \((\d+\.\d+\.\d+\.\d+)\)"
 
 # Start tailing the log file
-p = subprocess.Popen(['tail', '-F', logfile],
+queryfile = subprocess.Popen(['tail', '-F', logfile],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 data = {}
@@ -60,7 +60,7 @@ def getData(code, counter):
     waitingfordata = True
     # Loop through the output of tail
     while waitingfordata:
-        line = p.stdout.readline()
+        line = queryfile.stdout.readline()
         if line:
             # Convert the line to a string using the correct encoding
             line_str = line.decode()
