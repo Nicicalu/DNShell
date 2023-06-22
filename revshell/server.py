@@ -95,7 +95,7 @@ def getData(code, counter):
                         datastring = ""
                         for i in range(0, int(thisdata[2])):
                             datastring += data[thisdata[3]][i]
-                        #print(f"Base64: {datastring}")
+                        print(f"Base64: {datastring}")
                         # base64 decode
                         decoded = base64_decode_string(datastring)
                         # JSON decode
