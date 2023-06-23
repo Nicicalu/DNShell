@@ -139,6 +139,26 @@ def getData(code,counter):
                                 ] = thisdata[0].replace("_", "=")
 
             print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
+            datastring = ""
+            for i in range(0, int(thisdata[2])):
+                # if data[thisdata[3]] has key i
+                if i in data[thisdata[3]]:
+                    datastring += data[thisdata[3]][i]
+
+            # Lower because anti dns caching messed up the cases
+            datastring = datastring.lower()
+
+            #print(f"Base64 with hyphens: {datastring}")
+            # For every letter in the string, if there is a hyphen in front of it, change it to upper case
+            datastring = restore_case_by_hyphen(datastring.strip("-"))
+
+            #print(f"Base64: {datastring}")
+            
+            # cap the datastring variable to a length devideable by 4
+            datastring = datastring[:-(len(datastring) % 4)]
+            # base64 decode
+            decoded = base64_decode_string(datastring)
+            print(f"Partial data: {decoded}")
             if len(data[thisdata[3]]) == int(thisdata[2]):
                 #print("--------------------- Data recieved ---------------------")
                 # Put the data together in one variable
