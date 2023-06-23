@@ -163,9 +163,9 @@ def getData(code,counter):
                 return response
             
             response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
-            TTL = 60 * 5
-            rdata = A("1.1.1.1")
-            #response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.A, rclass=1, ttl=TTL, rdata=rdata))
+                #TTL = 60 * 5
+                #rdata = A("1.1.1.1")
+                #response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.A, rclass=1, ttl=TTL, rdata=rdata))
             
             s.sendto(b'%s' % response.pack(), addr)
         #else:
