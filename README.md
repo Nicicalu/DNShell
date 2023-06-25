@@ -1,6 +1,5 @@
 ![image](https://github.com/Nicicalu/DNShell/assets/52490746/e8d49789-d7a5-4238-86ae-470a6d96a14e)
 
-# DNS(hell)
 DNShell is a command and control (C2) tool that utilizes DNS communication for covert command execution and data exfiltration. It allows a client to establish a connection with a server using DNS queries and responses, enabling communication even in restrictive network environments.
 
 # **Getting Started**
