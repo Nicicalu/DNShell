@@ -69,7 +69,7 @@ The client-server communication in this tool follows a specific pattern to ensur
 
 ### DNS structure
 
-```json
+```bash
 commandcounter.identifier.domain
 ```
 
