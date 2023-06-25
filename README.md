@@ -36,8 +36,8 @@ DNShell is a command and control (C2) tool that utilizes DNS communication for c
     |  _  \ \ | |/  ___| |        | | |
     | | | |  \| |\ `--.| |__   ___| | |
     | | | | . ` | `--. \ '_ \ / _ \ | |
-    | |/ /| |\  |/__/ / | | |  __/ | |
-    |___/ _| _/____/|_| |_|___|_|_|
+    | |/ /| |\  |/\__/ / | | |  __/ | |
+    |___/ \_| \_/\____/|_| |_|\___|_|_|
 
 | ------------------------------------------------------------------------------------------------------|
 | When you start DNShell without parameters it let's you choose, what you want to do                    |
