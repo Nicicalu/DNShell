@@ -113,6 +113,8 @@ def sendData(code,counter,command):
             response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.TXT, rclass=1, ttl=TTL, rdata=rdata))
             s.sendto(b'%s' % response.pack(), addr)
             return;
+        #else:
+            #print("No valid request")
 
 
 def getData(code,counter):
