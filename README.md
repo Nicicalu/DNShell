@@ -24,7 +24,7 @@ DNShell is a Reverse Shell/command and control (C2) tool that utilizes DNS commu
       ```bash
       python3 server.py
       ```
-2. Set the NS (Nameserver) record of the domain you want to the IP of this public system.
+2. Set the NS (Nameserver) record of the domain you want to use, to the IP of this public system.
 3. Set up the client: Run the DNShell `server.py` and choose the option to generate the client file.
 4. Execute commands: Once the client is connected to the server, send encoded commands from the server to execute on the client system.
 
