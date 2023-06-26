@@ -132,7 +132,7 @@ def getData(code,counter):
             data[thisdata[3]][int(thisdata[1])
                                 ] = thisdata[0].replace("_", "=")
 
-            print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix='Progress:', suffix='Complete', bar_length=50)
+            print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix=f'{len(data[thisdata[3]])}/{thisdata[2]} - ', suffix='Complete', bar_length=50)
             if len(data[thisdata[3]]) == int(thisdata[2]):
                 #print("--------------------- Data recieved ---------------------")
                 # Put the data together in one variable
