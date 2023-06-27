@@ -37,6 +37,10 @@ function Send-Data {
     $encodedData = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($json))
 
     # This step is neccessary, because some DNS servers change the case of the letters randomly, so it doens't get cached
+    # This is called "0x20 encoding"
+    # - https://www.theregister.com/2023/01/19/google_dns_queries/
+    # - https://astrolavos.gatech.edu/articles/increased_dns_resistance.pdf
+    #
     # Add hyphen in front of every upper case letter
     $encodedData = AppendHyphenToUppercaseLetters $encodedData 
 
