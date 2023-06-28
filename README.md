@@ -30,7 +30,7 @@ DNShell is a Reverse Shell/command and control (C2) tool that utilizes DNS commu
 
 # Usage
 
-```
+```bash
      ______ _   _  _____ _          _ _
     |  _  \ \ | |/  ___| |        | | |
     | | | |  \| |\ `--.| |__   ___| | |
