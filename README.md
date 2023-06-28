@@ -38,20 +38,23 @@ DNShell is a Reverse Shell/command and control (C2) tool that utilizes DNS commu
     | |/ /| |\  |/\__/ / | | |  __/ | |
     |___/ \_| \_/\____/|_| |_|\___|_|_|
 
+
 | ------------------------------------------------------------------------------------------------------|
-| When you start DNShell without parameters it let's you choose, what you want to do                    |
+| When you start DNShell without parameters it starts the server and waits for incoming connections.    |
 | If you need the .ps1 file for the vitcim. Use the "--generate-client" argument                        |
 |                                                                                                       |
 | Author: Nicolas Caluori                                                                               |
 | Github: https://github.com/Nicicalu/dnshell                                                           |
 |-------------------------------------------------------------------------------------------------------|
 
-usage: server.py [-h] [--start-server] [--generate-client]
+usage: server.py [-h] [--start-server] [--generate-client] [--log-level LOG_LEVEL]
 
 options:
-  -h, --help         show this help message and exit
-  --start-server     Starts the listener
-  --generate-client  Generates the .ps1 client file
+  -h, --help            show this help message and exit
+  --start-server        Starts the listener
+  --generate-client     Generates the .ps1 client file
+  --log-level LOG_LEVEL
+                        Set the log level (ERROR=0, INFO=1, DEBUG=2)
 ```
 
 # How it works
