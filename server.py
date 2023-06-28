@@ -98,7 +98,7 @@ def parseRequest(request, addr):
 def sendData(code,counter,command):
     #print("func: SendData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind((settings["ip"], settings["port"]))
+    s.bind((settings["ip"], int(settings["port"])))
     while True:
         #print("Waiting fo Client to get it's data")
         rawrequest, addr = s.recvfrom(1024)
@@ -120,7 +120,7 @@ def sendData(code,counter,command):
 def getData(code,counter):
     #print("func: GetData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.bind((settings["ip"], settings["port"]))
+    s.bind((settings["ip"], int(settings["port"])))
     while True:
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
@@ -215,7 +215,6 @@ def setSettings():
     settings['domain'] = input(f'Enter domain (Press [Enter] for current: \"{currentDomain}\"): ') or currentDomain
     settings['ip'] = input(f'Enter the IP/Hostname that the dns server should listen to (0.0.0.0 to listen to every ip) (Press [Enter] for current: \"{currentIP}\"): ') or currentIP
     settings['port'] = input(f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ') or currentPort
-    settings['port'] = int(settings['port'])
     
     with open('settings.json', 'w') as f:
         json.dump(settings, f)
