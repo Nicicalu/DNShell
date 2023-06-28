@@ -86,7 +86,7 @@ data.counter.total.identifier-commandcounter.domain
 ```
 
 
-1. **data**: This part represents the data being transmitted. The data is a chunk of the whole, base64 encoded data transmitted.
+1. **data**: This part represents the data being transmitted. The data is a chunk of the whole, base32 encoded data transmitted.
 2. **counter**: This part indicates the sequence number of the current packet being transmitted. It helps in reconstructing the data on the receiving end.
 3. **total**: This part indicates the total number of packets into which the data is divided. It provides information about the complete data size and helps in reassembling the chunks on the receiving end.
 4. **identifier**: This part serves as an identifier for the specific transmission. It helps associate the transmitted data with the corresponding session. Currently, it’s just the timestamp of the time, where the client script was started.
@@ -107,3 +107,16 @@ The client always uses JSON to send data to the server. It includes the output o
   "hostname": "workstation01"
 }
 ```
+
+### Why base32 and not base64?
+Base64 can't be used via DNS reliably due to the possibility of 0x20 encoding by some DNS servers (e.g. Google DNS 😡). The 0x20 encoding, also known as "letter case randomization," is a technique employed by some DNS resolvers to provide additional security against DNS spoofing and cache poisoning attacks.
+
+In 0x20 encoding, the resolver modifies the letter case (upper or lower) of the letters in the domain name when performing DNS queries. For example, if a domain name contains the letter 'A,' it may be randomly encoded as either 'A' or 'a' in the DNS query. This encoding helps prevent attackers from easily guessing the correct domain names and increases the difficulty of exploiting DNS vulnerabilities. So `example.com` could be encoded as `eXaMpLe.cOm` or `EXAMple.cOM`. This breaks the base64 encoding, because the letters are not the same anymore and the server can't decode the data.
+
+To ensure reliable data transmission and avoid issues with DNS servers that perform 0x20 encoding, DNShell uses base32 encoding instead of base64 with upper and lowercase letters. Base32 encoding uses a limited character set consisting of uppercase letters (A-Z) and digits (2-7). This encoding scheme ensures that the transmitted data remains intact and unaffected by DNS server modifications.
+
+By using base32 encoding, DNShell can reliably transmit data over DNS queries, even in environments where DNS servers employ 0x20 encoding. It provides a consistent and covert communication channel between the client and server while maintaining compatibility with a wide range of DNS server configurations.
+
+**More information:**
+- https://www.theregister.com/2023/01/19/google_dns_queries/
+- https://astrolavos.gatech.edu/articles/increased_dns_resistance.pdf
