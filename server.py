@@ -214,7 +214,8 @@ def setSettings():
     # Prompt for domain and expose, and show current settings
     settings['domain'] = input(f'Enter domain (Press [Enter] for current: \"{currentDomain}\"): ') or currentDomain
     settings['ip'] = input(f'Enter the IP/Hostname that the dns server should listen to (0.0.0.0 to listen to every ip) (Press [Enter] for current: \"{currentIP}\"): ') or currentIP
-    settings['port'] = int(input(f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ')) or int(currentPort)
+    settings['port'] = input(f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ') or currentPort
+    settings['port'] = int(settings['port'])
     
     with open('settings.json', 'w') as f:
         json.dump(settings, f)
