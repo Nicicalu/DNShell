@@ -74,16 +74,16 @@ The client-server communication in this tool follows a specific pattern to ensur
 ```
 commandcounter.identifier.domain
 ```
+
+1. **commandcounter:** This part represents the count of the current DNS answer. It helps in tracking the progress of DNS queries and responses. Everytime a command is sent, this counter is increased.
+2. **identifier**: This part serves as an identifier for the specific transmission. It helps associate the transmitted data with the corresponding session. Currently, it’s just the timestamp of the time, where the client script was started.
+3. **domain:** This part represents the base domain name used for communication. It acts as the root domain for the entire communication process.
+
 Examples:
 ```
 1.1688471883.example.com
 2.1688471883.example.com
 ```
-
-
-1. **commandcounter:** This part represents the count of the current DNS answer. It helps in tracking the progress of DNS queries and responses. Everytime a command is sent, this counter is increased.
-2. **identifier**: This part serves as an identifier for the specific transmission. It helps associate the transmitted data with the corresponding session. Currently, it’s just the timestamp of the time, where the client script was started.
-3. **domain:** This part represents the base domain name used for communication. It acts as the root domain for the entire communication process.
 
 ## Client answer
 
@@ -92,19 +92,18 @@ Examples:
 ```
 data.counter.total.identifier-commandcounter.domain
 ```
-Examples:
-```
-JZSXMZLSEBDW63TOMEQGO2LWMUQHS33VEB2XA___.1.2.1688471883-3.example.com
-JBSWY3DPEB3W64TMMQ______.2.2.1688471883-3.example.com
-```
-
-
 1. **data**: This part represents the data being transmitted. The data is a chunk of the whole, base32 encoded data transmitted. The padding characters of base 32, `=` are changed to `_` because you can't use `=` in domains
 2. **counter**: This part indicates the sequence number of the current packet being transmitted. It helps in reconstructing the data on the receiving end.
 3. **total**: This part indicates the total number of packets into which the data is divided. It provides information about the complete data size and helps in reassembling the chunks on the receiving end.
 4. **identifier**: This part serves as an identifier for the specific transmission. It helps associate the transmitted data with the corresponding session. Currently, it’s just the timestamp of the time, where the client script was started.
 5. **commandcounter**: This part represents the count of the current DNS answer. It helps in tracking the progress of DNS queries and responses. Everytime a command is sent, this counter is increased.
 6. **domain**: This part represents the base domain name used for communication. It acts as the root domain for the entire communication process.
+
+Examples:
+```
+JZSXMZLSEBDW63TOMEQGO2LWMUQHS33VEB2XA___.1.2.1688471883-3.example.com
+JBSWY3DPEB3W64TMMQ______.2.2.1688471883-3.example.com
+```
 
 ### Data structure
 
