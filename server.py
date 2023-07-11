@@ -102,6 +102,8 @@ def sendData(code, counter, command):
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         requestdomain = query["domain_name"].lower()
+        if(loglevel >= 2):
+            print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
         if(query["query_type"] == "TXT" and requestdomain == f"{counter}.{code}.{settings['domain']}.".lower()):
             if(loglevel >= 1):
                 print(f"Responding with command '{command}' for request domain '{requestdomain}'")
