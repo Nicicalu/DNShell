@@ -114,7 +114,7 @@ def sendData(code, counter, command):
             return
         else:
             if(loglevel >= 2):
-                print("No valid request")
+                print("No valid request (sendData)")
 
 
 def getData(code, counter):
@@ -169,7 +169,7 @@ def getData(code, counter):
             s.sendto(b'%s' % response.pack(), addr)
         else:
             if(loglevel >= 2):
-                print("No valid request")
+                print("No valid request (getData)")
 
 
 def startServer():
