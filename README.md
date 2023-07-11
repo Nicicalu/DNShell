@@ -125,7 +125,7 @@ Base64 can't be used via DNS reliably due to the possibility of 0x20 encoding by
 
 In 0x20 encoding, the resolver modifies the letter case (upper or lower) of the letters in the domain name when performing DNS queries. For example, if a domain name contains the letter 'A,' it may be randomly encoded as either 'A' or 'a' in the DNS query. This encoding helps prevent attackers from easily guessing the correct domain names and increases the difficulty of exploiting DNS vulnerabilities. So `example.com` could be encoded as `eXaMpLe.cOm` or `EXAMple.cOM`. This breaks the base64 encoding, because the letters are not the same anymore and the server can't decode the data.
 
-To ensure reliable data transmission and avoid issues with DNS servers that perform 0x20 encoding, DNShell uses base32 encoding instead of base64 with upper and lowercase letters. Base32 encoding uses a limited character set consisting of uppercase letters (A-Z) and digits (2-7). This encoding scheme ensures that the transmitted data remains intact and unaffected by DNS server modifications.
+To ensure reliable data transmission and avoid issues with DNS servers that perform 0x20 encoding, DNShell uses base32 encoding instead of base64. Base32 encoding uses a limited character set consisting of uppercase letters (A-Z) and digits (2-7). This encoding scheme ensures that the transmitted data remains intact and unaffected by DNS server modifications.
 
 By using base32 encoding, DNShell can reliably transmit data over DNS queries, even in environments where DNS servers employ 0x20 encoding. It provides a consistent and covert communication channel between the client and server while maintaining compatibility with a wide range of DNS server configurations.
 
