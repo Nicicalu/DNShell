@@ -46,7 +46,7 @@ def base64_encode_string(string):
 
 def base32_decode_string(encoded_string):
     decoded_bytes = base64.b32decode(encoded_string)
-    decoded_string = decoded_bytes.decode('utf-8')
+    decoded_string = decoded_bytes.decode('unicode_escape')
     return decoded_string
 
 
