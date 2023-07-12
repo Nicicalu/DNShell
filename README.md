@@ -2,7 +2,7 @@
 
 DNShell is a Reverse Shell/command and control (C2) tool that utilizes DNS communication for covert command execution and data exfiltration. It allows a client to establish a connection with a server using DNS queries and responses, enabling communication even in restrictive network environments.
 
-**Disclaimer ⚠️**
+### ⚠️ Disclaimer ⚠️
 > 
 > The DNShell repository and its software are intended for educational and research purposes only. Use of DNShell for illegal activities or unauthorized access is strictly prohibited. The authors and contributors are > not responsible for any misuse or damages caused by the use of this software.
 
