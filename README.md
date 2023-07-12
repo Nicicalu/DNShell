@@ -4,7 +4,7 @@ DNShell is a Reverse Shell/command and control (C2) tool that utilizes DNS commu
 
 ### ⚠️ Disclaimer ⚠️
 > 
-> The DNShell repository and its software are intended for educational and research purposes only. Use of DNShell for illegal activities or unauthorized access is strictly prohibited. The authors and contributors are > not responsible for any misuse or damages caused by the use of this software.
+> The DNShell repository and its software are intended for educational and research purposes only. Use of DNShell for illegal activities or unauthorized access is strictly prohibited. The authors and contributors are not responsible for any misuse or damages caused by the use of this software.
 
 # **Getting Started**
 
