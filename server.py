@@ -82,10 +82,7 @@ def generateClient():
 
 def parseRequest(request, addr):
     domainparts = str(request.q.qname).replace(f".{settings['domain']}", "")
-    pattern = r""
     result = re.sub(r'([^\.]{63})\.', r'\1', domainparts)
-    
-    print(f"------------ {result}")
     return {
         "ip_address": addr[0],
         "domain_name": str(request.q.qname),
