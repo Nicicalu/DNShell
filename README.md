@@ -138,6 +138,12 @@ To ensure reliable data transmission and avoid issues with DNS servers that perf
 
 By using base32 encoding, DNShell can reliably transmit data over DNS queries, even in environments where DNS servers employ 0x20 encoding. It provides a consistent and covert communication channel between the client and server while maintaining compatibility with a wide range of DNS server configurations.
 
+### Can you send files?
+Absolutely, you can achieve that. You can issue a command to convert a file into Base64, Base32, or any other encoding, and then retrieve the resulting data (by printing it to the commandline).
+Please note, however, that in my tests, it required sending approximately 8300 DNS queries for each megabyte of data. Keep in mind that such a high volume of DNS queries may lead to errors.
+Additionally, the increased network/dns activity raises the likelihood of detection by network administrators or security systems, so there's a higher risk of being caught or someone becoming suspicious of unusual network behavior.
+This is obviously not a very good solution so it would make more sense to adapt the tool to be optimized for files.
+
 **More information:**
 - https://www.theregister.com/2023/01/19/google_dns_queries/
 - https://astrolavos.gatech.edu/articles/increased_dns_resistance.pdf
