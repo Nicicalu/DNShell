@@ -62,6 +62,11 @@ options:
 ```
 
 # How it works
+## How the DNS query finds its way to the hacker (normal DNS behaviour)
+![How the DNS request reaches to the hacker](docs/DNShell_en-DNS%20principal.png)
+
+## Communication Flow
+![How the communication works](docs/DNShell_en-Communication.drawio.png)
 
 ## Server sending commands
 
